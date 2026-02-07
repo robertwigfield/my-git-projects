@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>When I Die</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg: #f0f0f5;
+  --color-card: #ffffff;
+  --color-primary: #1a1a2e;
+  --color-accent: #0f3460;
+  --color-accent-light: #e8edf4;
+  --color-text: #333333;
+  --color-muted: #777777;
+  --color-border: #ddd;
+  --color-danger: #c0392b;
+  --color-success: #27ae60;
+  --radius: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+header {
+  background: var(--color-primary);
+  color: #fff;
+  text-align: center;
+  padding: 48px 24px 40px;
+}
+
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+header .subtitle {
+  margin-top: 8px;
+  color: #aaaacc;
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main {
+  max-width: 760px;
+  margin: -20px auto 40px;
+  padding: 0 16px;
+}
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+}
+
+.card h2 {
+  font-size: 1.3rem;
+  color: var(--color-accent);
+  margin-bottom: 6px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--color-accent-light);
+}
+
+.section-hint {
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  margin-bottom: 16px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+}
+
+@media (max-width: 600px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field-group {
+  margin-bottom: 12px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.field-group input,
+.field-group textarea,
+.field-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--color-text);
+  transition: border-color 0.2s;
+  background: #fafafa;
+}
+
+.field-group input:focus,
+.field-group textarea:focus,
+.field-group select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  background: #fff;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.repeater-list {
+  margin-bottom: 12px;
+}
+
+.repeater-item {
+  background: var(--color-accent-light);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.repeater-item .item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.repeater-item .item-header h3 {
+  font-size: 0.95rem;
+  color: var(--color-accent);
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.btn-remove:hover {
+  background: rgba(192, 57, 43, 0.1);
+}
+
+.btn-add {
+  display: inline-block;
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 2px dashed var(--color-border);
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: center;
+}
+
+.btn-add:hover {
+  border-color: var(--color-accent);
+  background: #dce3ee;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.btn-save,
+.btn-generate {
+  padding: 14px 32px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save {
+  background: var(--color-card);
+  color: var(--color-accent);
+  border: 2px solid var(--color-accent);
+}
+
+.btn-save:hover {
+  background: var(--color-accent-light);
+}
+
+.btn-generate {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn-generate:hover {
+  background: #0a2848;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  z-index: 1000;
+  transition: opacity 0.3s;
+}
+
+.toast.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>When I Die</h1>
+    <p class="subtitle">Create a comprehensive document for your loved one with everything they need to know.</p>
+  </header>
+
+  <main>
+    <form id="main-form">
+      <!-- Document Setup -->
+      <section class="card" id="section-setup">
+        <h2>Document Setup</h2>
+        <div class="field-group">
+          <label for="documentTitle">Document Title</label>
+          <input type="text" id="documentTitle" name="documentTitle" value="When I Die" placeholder="When I Die">
+        </div>
+        <div class="field-group">
+          <label for="recipientName">Recipient's Name</label>
+          <input type="text" id="recipientName" name="recipientName" placeholder="e.g. Sarah">
+        </div>
+      </section>
+
+      <!-- Personal Information -->
+      <section class="card" id="section-personal">
+        <h2>Personal Information</h2>
+        <div class="grid-2">
+          <div class="field-group">
+            <label for="personal-fullName">Full Legal Name</label>
+            <input type="text" id="personal-fullName" data-path="personal.fullName">
+          </div>
+          <div class="field-group">
+            <label for="personal-dateOfBirth">Date of Birth</label>
+            <input type="text" id="personal-dateOfBirth" data-path="personal.dateOfBirth" placeholder="MM/DD/YYYY">
+          </div>
+          <div class="field-group">
+            <label for="personal-ssnLocation">SSN Card Location</label>
+            <input type="text" id="personal-ssnLocation" data-path="personal.ssnLocation" placeholder="Where your SSN card is stored">
+          </div>
+          <div class="field-group">
+            <label for="personal-citizenship">Citizenship</label>
+            <input type="text" id="personal-citizenship" data-path="personal.citizenship">
+          </div>
+          <div class="field-group">
+            <label for="personal-driversLicense">Driver's License #</label>
+            <input type="text" id="personal-driversLicense" data-path="personal.driversLicense">
+          </div>
+          <div class="field-group">
+            <label for="personal-passport">Passport # / Location</label>
+            <input type="text" id="personal-passport" data-path="personal.passport">
+          </div>
+          <div class="field-group">
+            <label for="personal-bloodType">Blood Type</label>
+            <input type="text" id="personal-bloodType" data-path="personal.bloodType">
+          </div>
+          <div class="field-group">
+            <label for="personal-allergies">Allergies</label>
+            <input type="text" id="personal-allergies" data-path="personal.allergies">
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="personal-primaryPhysician">Primary Physician (name &amp; phone)</label>
+          <input type="text" id="personal-primaryPhysician" data-path="personal.primaryPhysician">
+        </div>
+      </section>
+
+      <!-- Financial Accounts -->
+      <section class="card" id="section-financial">
+        <h2>Financial Accounts</h2>
+        <p class="section-hint">Bank accounts, investment accounts, retirement accounts, etc.</p>
+        <div id="financial-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addFinancial()">+ Add Account</button>
+      </section>
+
+      <!-- Insurance Policies -->
+      <section class="card" id="section-insurance">
+        <h2>Insurance Policies</h2>
+        <p class="section-hint">Life, health, auto, home, umbrella, etc.</p>
+        <div id="insurance-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addInsurance()">+ Add Policy</button>
+      </section>
+
+      <!-- Legal Documents -->
+      <section class="card" id="section-legal">
+        <h2>Legal Documents</h2>
+        <div class="grid-2">
+          <div class="field-group">
+            <label>Will Location</label>
+            <input type="text" data-path="legal.willLocation">
+          </div>
+          <div class="field-group">
+            <label>Trust Location</label>
+            <input type="text" data-path="legal.trustLocation">
+          </div>
+          <div class="field-group">
+            <label>Power of Attorney</label>
+            <input type="text" data-path="legal.powerOfAttorney">
+          </div>
+          <div class="field-group">
+            <label>Healthcare Directive Location</label>
+            <input type="text" data-path="legal.healthcareDirective">
+          </div>
+          <div class="field-group">
+            <label>Attorney Name</label>
+            <input type="text" data-path="legal.attorneyName">
+          </div>
+          <div class="field-group">
+            <label>Attorney Phone</label>
+            <input type="text" data-path="legal.attorneyPhone">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Attorney Email</label>
+          <input type="text" data-path="legal.attorneyEmail">
+        </div>
+        <div class="field-group">
+          <label>Notes</label>
+          <textarea data-path="legal.notes" rows="2"></textarea>
+        </div>
+      </section>
+
+      <!-- Property & Assets -->
+      <section class="card" id="section-property">
+        <h2>Property &amp; Assets</h2>
+        <p class="section-hint">Real estate, vehicles, valuable personal property, etc.</p>
+        <div id="property-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addProperty()">+ Add Property</button>
+      </section>
+
+      <!-- Digital Accounts -->
+      <section class="card" id="section-digital">
+        <h2>Digital Accounts &amp; Access</h2>
+        <p class="section-hint">Email, social media, password manager, cloud storage, etc. Don't store actual passwords here &mdash; just hints or locations.</p>
+        <div id="digital-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addDigital()">+ Add Account</button>
+      </section>
+
+      <!-- Important Contacts -->
+      <section class="card" id="section-contacts">
+        <h2>Important Contacts</h2>
+        <p class="section-hint">Attorney, accountant, financial advisor, doctors, family, close friends, employer, etc.</p>
+        <div id="contacts-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addContact()">+ Add Contact</button>
+      </section>
+
+      <!-- Subscriptions -->
+      <section class="card" id="section-subscriptions">
+        <h2>Subscriptions &amp; Recurring Bills</h2>
+        <div id="subscriptions-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addSubscription()">+ Add Subscription</button>
+      </section>
+
+      <!-- Pets -->
+      <section class="card" id="section-pets">
+        <h2>Pets &amp; Care Instructions</h2>
+        <div id="pets-list" class="repeater-list"></div>
+        <button type="button" class="btn-add" onclick="addPet()">+ Add Pet</button>
+      </section>
+
+      <!-- Final Wishes -->
+      <section class="card" id="section-wishes">
+        <h2>Final Wishes</h2>
+        <div class="grid-2">
+          <div class="field-group">
+            <label>Burial / Cremation Preference</label>
+            <input type="text" data-path="finalWishes.burialPreference">
+          </div>
+          <div class="field-group">
+            <label>Funeral Home Preference</label>
+            <input type="text" data-path="finalWishes.funeralHome">
+          </div>
+          <div class="field-group">
+            <label>Organ Donation</label>
+            <input type="text" data-path="finalWishes.organDonation" placeholder="Yes / No / Already registered">
+          </div>
+          <div class="field-group">
+            <label>Ceremony Preferences</label>
+            <input type="text" data-path="finalWishes.ceremonyPreferences">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Special Requests</label>
+          <textarea data-path="finalWishes.specialRequests" rows="3"></textarea>
+        </div>
+      </section>
+
+      <!-- Personal Message -->
+      <section class="card" id="section-message">
+        <h2>A Personal Message</h2>
+        <p class="section-hint">Write a personal letter or message to your loved one. This will appear as the final page of the document.</p>
+        <div class="field-group">
+          <textarea id="personalMessage" name="personalMessage" rows="8" placeholder="My dearest..."></textarea>
+        </div>
+      </section>
+
+      <!-- Actions -->
+      <section class="actions">
+        <button type="button" class="btn-save" onclick="saveProgress()">Save Progress</button>
+        <button type="button" class="btn-generate" onclick="generatePDF()">Generate PDF Document</button>
+      </section>
+    </form>
+  </main>
+
+  <footer>
+    <p>Your data stays in your browser. Nothing is sent to any server. The PDF is generated right on your computer.</p>
+  </footer>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+// ---- Repeater Templates ----
+
+function repeaterItem(prefix, index, title, fieldsHTML) {
+  return '<div class="repeater-item" data-prefix="' + prefix + '" data-index="' + index + '">' +
+    '<div class="item-header">' +
+    '<h3>' + title + ' #' + (index + 1) + '</h3>' +
+    '<button type="button" class="btn-remove" onclick="removeItem(this)">Remove</button>' +
+    '</div>' +
+    '<div class="grid-2">' + fieldsHTML + '</div>' +
+    '</div>';
+}
+
+function inputField(prefix, index, key, label, placeholder) {
+  placeholder = placeholder || '';
+  return '<div class="field-group">' +
+    '<label>' + label + '</label>' +
+    '<input type="text" data-array="' + prefix + '" data-index="' + index + '" data-key="' + key + '" placeholder="' + placeholder + '">' +
+    '</div>';
+}
+
+// ---- Add Functions ----
+
+function nextIndex(listId) {
+  return document.getElementById(listId).children.length;
+}
+
+function addFinancial() {
+  var i = nextIndex('financial-list');
+  document.getElementById('financial-list').insertAdjacentHTML('beforeend', repeaterItem('financial', i, 'Account',
+    inputField('financial', i, 'nickname', 'Account Nickname', 'e.g. Chase Checking') +
+    inputField('financial', i, 'institution', 'Institution') +
+    inputField('financial', i, 'accountType', 'Account Type', 'Checking / Savings / 401k / IRA / Brokerage') +
+    inputField('financial', i, 'lastFour', 'Last 4 Digits') +
+    inputField('financial', i, 'approxValue', 'Approximate Value') +
+    inputField('financial', i, 'contactPhone', 'Contact Phone') +
+    inputField('financial', i, 'onlineAccess', 'Online Access Notes') +
+    inputField('financial', i, 'beneficiary', 'Beneficiary')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="financial" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addInsurance() {
+  var i = nextIndex('insurance-list');
+  document.getElementById('insurance-list').insertAdjacentHTML('beforeend', repeaterItem('insurance', i, 'Policy',
+    inputField('insurance', i, 'type', 'Type', 'Life / Health / Auto / Home / Umbrella') +
+    inputField('insurance', i, 'provider', 'Provider') +
+    inputField('insurance', i, 'policyNumber', 'Policy Number') +
+    inputField('insurance', i, 'coverageAmount', 'Coverage Amount') +
+    inputField('insurance', i, 'premium', 'Monthly Premium') +
+    inputField('insurance', i, 'beneficiary', 'Beneficiary') +
+    inputField('insurance', i, 'agentContact', 'Agent / Contact')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="insurance" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addProperty() {
+  var i = nextIndex('property-list');
+  document.getElementById('property-list').insertAdjacentHTML('beforeend', repeaterItem('property', i, 'Property',
+    inputField('property', i, 'description', 'Description', 'e.g. Primary residence') +
+    inputField('property', i, 'type', 'Type', 'Real estate / Vehicle / Other') +
+    inputField('property', i, 'address', 'Address / Location') +
+    inputField('property', i, 'estimatedValue', 'Estimated Value') +
+    inputField('property', i, 'lienHolder', 'Mortgage / Lien Holder') +
+    inputField('property', i, 'accountNumber', 'Account #') +
+    inputField('property', i, 'titleLocation', 'Title / Deed Location')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="property" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addDigital() {
+  var i = nextIndex('digital-list');
+  document.getElementById('digital-list').insertAdjacentHTML('beforeend', repeaterItem('digital', i, 'Account',
+    inputField('digital', i, 'service', 'Service', 'e.g. Gmail, Facebook, 1Password') +
+    inputField('digital', i, 'username', 'Username / Email') +
+    inputField('digital', i, 'passwordHint', 'Password Hint / Location', 'Do NOT put actual passwords here') +
+    inputField('digital', i, 'twoFactor', '2FA Method', 'Authenticator app / SMS / etc.') +
+    inputField('digital', i, 'recoveryEmail', 'Recovery Email')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="digital" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addContact() {
+  var i = nextIndex('contacts-list');
+  document.getElementById('contacts-list').insertAdjacentHTML('beforeend', repeaterItem('contacts', i, 'Contact',
+    inputField('contacts', i, 'name', 'Name') +
+    inputField('contacts', i, 'role', 'Relationship / Role', 'Attorney / Doctor / Brother / etc.') +
+    inputField('contacts', i, 'phone', 'Phone') +
+    inputField('contacts', i, 'email', 'Email') +
+    inputField('contacts', i, 'address', 'Address')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="contacts" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addSubscription() {
+  var i = nextIndex('subscriptions-list');
+  document.getElementById('subscriptions-list').insertAdjacentHTML('beforeend', repeaterItem('subscriptions', i, 'Subscription',
+    inputField('subscriptions', i, 'name', 'Name', 'e.g. Netflix, Mortgage, Electric') +
+    inputField('subscriptions', i, 'amount', 'Amount') +
+    inputField('subscriptions', i, 'frequency', 'Frequency', 'Monthly / Yearly / Quarterly') +
+    inputField('subscriptions', i, 'paymentMethod', 'Payment Method', 'Which card / account') +
+    inputField('subscriptions', i, 'cancelInstructions', 'How to Cancel')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="subscriptions" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function addPet() {
+  var i = nextIndex('pets-list');
+  document.getElementById('pets-list').insertAdjacentHTML('beforeend', repeaterItem('pets', i, 'Pet',
+    inputField('pets', i, 'name', 'Pet Name') +
+    inputField('pets', i, 'breed', 'Type / Breed') +
+    inputField('pets', i, 'age', 'Age') +
+    inputField('pets', i, 'vet', 'Veterinarian') +
+    inputField('pets', i, 'medications', 'Medications') +
+    inputField('pets', i, 'diet', 'Food / Diet') +
+    inputField('pets', i, 'caretaker', 'Preferred Caretaker')
+  ) + '<div class="field-group"><label>Notes</label><textarea data-array="pets" data-index="' + i + '" data-key="notes" rows="2"></textarea></div>');
+}
+
+function removeItem(btn) {
+  btn.closest('.repeater-item').remove();
+}
+
+// ---- Data Collection ----
+
+function collectFormData() {
+  var data = {
+    documentTitle: document.getElementById('documentTitle').value || 'When I Die',
+    recipientName: document.getElementById('recipientName').value,
+    personal: {},
+    legal: {},
+    finalWishes: {},
+    personalMessage: document.getElementById('personalMessage').value,
+    financial: [],
+    insurance: [],
+    property: [],
+    digital: [],
+    contacts: [],
+    subscriptions: [],
+    pets: [],
+  };
+
+  document.querySelectorAll('[data-path]').forEach(function(el) {
+    var parts = el.dataset.path.split('.');
+    var target = data;
+    for (var i = 0; i < parts.length - 1; i++) {
+      if (!target[parts[i]]) target[parts[i]] = {};
+      target = target[parts[i]];
+    }
+    target[parts[parts.length - 1]] = el.value;
+  });
+
+  var arrays = ['financial', 'insurance', 'property', 'digital', 'contacts', 'subscriptions', 'pets'];
+  arrays.forEach(function(prefix) {
+    var items = document.querySelectorAll('.repeater-item[data-prefix="' + prefix + '"]');
+    items.forEach(function(item) {
+      var obj = {};
+      item.querySelectorAll('[data-key]').forEach(function(el) {
+        obj[el.dataset.key] = el.value;
+      });
+      data[prefix].push(obj);
+    });
+  });
+
+  return data;
+}
+
+// ---- Save / Load from localStorage ----
+
+function saveProgress() {
+  var data = collectFormData();
+  localStorage.setItem('when-i-die-data', JSON.stringify(data));
+  showToast('Progress saved to your browser');
+}
+
+function loadProgress() {
+  var raw = localStorage.getItem('when-i-die-data');
+  if (!raw) return;
+
+  var data;
+  try { data = JSON.parse(raw); } catch(e) { return; }
+
+  if (data.documentTitle) document.getElementById('documentTitle').value = data.documentTitle;
+  if (data.recipientName) document.getElementById('recipientName').value = data.recipientName;
+  if (data.personalMessage) document.getElementById('personalMessage').value = data.personalMessage;
+
+  document.querySelectorAll('[data-path]').forEach(function(el) {
+    var parts = el.dataset.path.split('.');
+    var val = data;
+    for (var i = 0; i < parts.length; i++) {
+      if (!val) break;
+      val = val[parts[i]];
+    }
+    if (val) el.value = val;
+  });
+
+  var adders = {
+    financial: addFinancial,
+    insurance: addInsurance,
+    property: addProperty,
+    digital: addDigital,
+    contacts: addContact,
+    subscriptions: addSubscription,
+    pets: addPet,
+  };
+
+  Object.keys(adders).forEach(function(prefix) {
+    var arr = data[prefix];
+    if (!arr || !arr.length) return;
+    arr.forEach(function(item, idx) {
+      adders[prefix]();
+      Object.keys(item).forEach(function(key) {
+        var el = document.querySelector('[data-array="' + prefix + '"][data-index="' + idx + '"][data-key="' + key + '"]');
+        if (el) el.value = item[key];
+      });
+    });
+  });
+
+  showToast('Previous progress restored');
+}
+
+// ---- PDF Generation (client-side with jsPDF) ----
+
+function hasContent(obj) {
+  return Object.values(obj).some(function(v) { return typeof v === 'string' && v.trim(); });
+}
+
+function generatePDF() {
+  var data = collectFormData();
+  var btn = document.querySelector('.btn-generate');
+  var originalText = btn.textContent;
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    var pageW = doc.internal.pageSize.getWidth();
+    var pageH = doc.internal.pageSize.getHeight();
+    var margin = 60;
+    var contentW = pageW - margin * 2;
+    var y = 0;
+
+    // ---- Cover Page ----
+    doc.setFillColor(26, 26, 46);
+    doc.rect(0, 0, pageW, pageH, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(36);
+    doc.text(data.documentTitle || 'When I Die', pageW / 2, 220, { align: 'center' });
+
+    doc.setTextColor(170, 170, 204);
+    doc.setFontSize(16);
+    doc.text('Important Information For You', pageW / 2, 260, { align: 'center' });
+
+    if (data.personal && data.personal.fullName) {
+      doc.setTextColor(136, 136, 170);
+      doc.setFontSize(13);
+      doc.text('Prepared by ' + data.personal.fullName, pageW / 2, 320, { align: 'center' });
+    }
+
+    if (data.recipientName) {
+      doc.setTextColor(136, 136, 170);
+      doc.setFontSize(13);
+      doc.text('For ' + data.recipientName, pageW / 2, 345, { align: 'center' });
+    }
+
+    var today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.setTextColor(102, 102, 136);
+    doc.setFontSize(11);
+    doc.text('Generated on ' + today, pageW / 2, 400, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.text('This document contains sensitive information. Store it securely.', pageW / 2, pageH - 80, { align: 'center' });
+
+    // ---- Helper functions ----
+    function newPage() {
+      doc.addPage();
+      y = margin;
+      doc.setTextColor(51, 51, 51);
+    }
+
+    function checkSpace(needed) {
+      if (y + needed > pageH - margin) {
+        newPage();
+      }
+    }
+
+    function addSection(title) {
+      newPage();
+      doc.setFontSize(20);
+      doc.setTextColor(15, 52, 96);
+      doc.text(title, margin, y);
+      y += 8;
+      doc.setDrawColor(204, 204, 204);
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageW - margin, y);
+      y += 20;
+    }
+
+    function addSubsection(title) {
+      checkSpace(60);
+      y += 8;
+      doc.setFontSize(13);
+      doc.setTextColor(22, 33, 62);
+      doc.text(title, margin, y);
+      y += 16;
+    }
+
+    function addField(label, value) {
+      if (!value || !value.trim()) return;
+      checkSpace(32);
+      doc.setFontSize(9);
+      doc.setTextColor(102, 102, 102);
+      doc.text(label, margin, y);
+      y += 12;
+
+      doc.setFontSize(11);
+      doc.setTextColor(51, 51, 51);
+      var lines = doc.splitTextToSize(value.trim(), contentW);
+      doc.text(lines, margin, y);
+      y += lines.length * 14 + 6;
+    }
+
+    // ---- Content Sections ----
+
+    if (data.personal && hasContent(data.personal)) {
+      addSection('Personal Information');
+      addField('Full Legal Name', data.personal.fullName);
+      addField('Date of Birth', data.personal.dateOfBirth);
+      addField('Social Security Number Location', data.personal.ssnLocation);
+      addField('Citizenship', data.personal.citizenship);
+      addField("Driver's License #", data.personal.driversLicense);
+      addField('Passport # / Location', data.personal.passport);
+      addField('Blood Type', data.personal.bloodType);
+      addField('Allergies', data.personal.allergies);
+      addField('Primary Physician', data.personal.primaryPhysician);
+    }
+
+    if (data.financial && data.financial.length) {
+      addSection('Financial Accounts');
+      data.financial.forEach(function(acct, i) {
+        addSubsection(acct.nickname || ('Account ' + (i + 1)));
+        addField('Institution', acct.institution);
+        addField('Account Type', acct.accountType);
+        addField('Account # (last 4)', acct.lastFour);
+        addField('Approximate Value', acct.approxValue);
+        addField('Contact Phone', acct.contactPhone);
+        addField('Online Access Notes', acct.onlineAccess);
+        addField('Beneficiary', acct.beneficiary);
+        addField('Notes', acct.notes);
+      });
+    }
+
+    if (data.insurance && data.insurance.length) {
+      addSection('Insurance Policies');
+      data.insurance.forEach(function(policy, i) {
+        addSubsection(policy.type || ('Policy ' + (i + 1)));
+        addField('Provider', policy.provider);
+        addField('Policy Number', policy.policyNumber);
+        addField('Coverage Amount', policy.coverageAmount);
+        addField('Monthly Premium', policy.premium);
+        addField('Beneficiary', policy.beneficiary);
+        addField('Agent / Contact', policy.agentContact);
+        addField('Notes', policy.notes);
+      });
+    }
+
+    if (data.legal && hasContent(data.legal)) {
+      addSection('Legal Documents');
+      addField('Will Location', data.legal.willLocation);
+      addField('Trust Location', data.legal.trustLocation);
+      addField('Power of Attorney', data.legal.powerOfAttorney);
+      addField('Healthcare Directive Location', data.legal.healthcareDirective);
+      addField('Attorney Name', data.legal.attorneyName);
+      addField('Attorney Phone', data.legal.attorneyPhone);
+      addField('Attorney Email', data.legal.attorneyEmail);
+      addField('Notes', data.legal.notes);
+    }
+
+    if (data.property && data.property.length) {
+      addSection('Property & Assets');
+      data.property.forEach(function(prop, i) {
+        addSubsection(prop.description || ('Property ' + (i + 1)));
+        addField('Type', prop.type);
+        addField('Address / Location', prop.address);
+        addField('Estimated Value', prop.estimatedValue);
+        addField('Mortgage / Lien Holder', prop.lienHolder);
+        addField('Account #', prop.accountNumber);
+        addField('Title / Deed Location', prop.titleLocation);
+        addField('Notes', prop.notes);
+      });
+    }
+
+    if (data.digital && data.digital.length) {
+      addSection('Digital Accounts & Access');
+      data.digital.forEach(function(acct, i) {
+        addSubsection(acct.service || ('Account ' + (i + 1)));
+        addField('Username / Email', acct.username);
+        addField('Password Hint / Location', acct.passwordHint);
+        addField('2FA Method', acct.twoFactor);
+        addField('Recovery Email', acct.recoveryEmail);
+        addField('Notes', acct.notes);
+      });
+    }
+
+    if (data.contacts && data.contacts.length) {
+      addSection('Important Contacts');
+      data.contacts.forEach(function(contact, i) {
+        addSubsection(contact.name || ('Contact ' + (i + 1)));
+        addField('Relationship / Role', contact.role);
+        addField('Phone', contact.phone);
+        addField('Email', contact.email);
+        addField('Address', contact.address);
+        addField('Notes', contact.notes);
+      });
+    }
+
+    if (data.subscriptions && data.subscriptions.length) {
+      addSection('Subscriptions & Recurring Bills');
+      data.subscriptions.forEach(function(sub, i) {
+        addSubsection(sub.name || ('Subscription ' + (i + 1)));
+        addField('Amount', sub.amount);
+        addField('Frequency', sub.frequency);
+        addField('Payment Method', sub.paymentMethod);
+        addField('How to Cancel', sub.cancelInstructions);
+        addField('Notes', sub.notes);
+      });
+    }
+
+    if (data.pets && data.pets.length) {
+      addSection('Pets & Care Instructions');
+      data.pets.forEach(function(pet, i) {
+        addSubsection(pet.name || ('Pet ' + (i + 1)));
+        addField('Type / Breed', pet.breed);
+        addField('Age', pet.age);
+        addField('Veterinarian', pet.vet);
+        addField('Medications', pet.medications);
+        addField('Food / Diet', pet.diet);
+        addField('Preferred Caretaker', pet.caretaker);
+        addField('Notes', pet.notes);
+      });
+    }
+
+    if (data.finalWishes && hasContent(data.finalWishes)) {
+      addSection('Final Wishes');
+      addField('Burial / Cremation Preference', data.finalWishes.burialPreference);
+      addField('Funeral Home Preference', data.finalWishes.funeralHome);
+      addField('Organ Donation', data.finalWishes.organDonation);
+      addField('Ceremony Preferences', data.finalWishes.ceremonyPreferences);
+      addField('Special Requests', data.finalWishes.specialRequests);
+    }
+
+    if (data.personalMessage && data.personalMessage.trim()) {
+      newPage();
+      doc.setFontSize(20);
+      doc.setTextColor(15, 52, 96);
+      doc.text('A Personal Message', pageW / 2, y, { align: 'center' });
+      y += 30;
+      doc.setFontSize(12);
+      doc.setTextColor(51, 51, 51);
+      var msgLines = doc.splitTextToSize(data.personalMessage, contentW);
+      doc.text(msgLines, margin, y);
+    }
+
+    doc.save('when-i-die-' + new Date().toISOString().slice(0, 10) + '.pdf');
+    showToast('PDF downloaded!');
+
+  } catch(err) {
+    console.error(err);
+    showToast('Error generating PDF: ' + err.message);
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+// ---- Toast ----
+
+function showToast(message) {
+  var toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  setTimeout(function() { toast.classList.add('hidden'); }, 3000);
+}
+
+// ---- Init ----
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadProgress();
+});
+  </script>
+</body>
+</html>
