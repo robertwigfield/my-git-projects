@@ -1,0 +1,16 @@
+{
+  "name": "when-i-die",
+  "version": "1.0.0",
+  "description": "Generate a comprehensive document for your significant other with all important life information",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["estate-planning", "emergency-document", "family"],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.0",
+    "pdfkit": "^0.15.0"
+  }
+}
